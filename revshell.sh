@@ -39,7 +39,7 @@ CSR=req.csr
 MAKECERT=0
 MAKEKEY=0
 
-pushd $CERTS
+pushd $CERTS &>/dev/null
 if [[ ! -f $CERT ]]; then
 	MAKECERT=1
 fi
@@ -59,7 +59,7 @@ if [[ $MAKECERT -eq 1 ]]; then
 	openssl x509 -req -in $CSR -out $CERT -signkey $KEY -sha256
 	rm -rf $CSR
 fi
-popd
+popd &>/dev/null
 
 
 # Reverse shell!
